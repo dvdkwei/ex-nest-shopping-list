@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <title>NestJS Shopping List</title>
+</head>
+
+<body>
+  <div class="container">
+    <h1>NestJS Shopping List</h1>
+    <div class="divider">
+      <div class="items">
+        <ul id="list">
+        </ul>
+      </div>
+      <div class="divider-line"></div>
+      <form class="add-item-form" onsubmit="addItem(event)">
+        <input id="new-item-input" placeholder="ADD ITEM..." required />
+        <input id="amount-input" placeholder="Amount" type="number" min="1" value="1" required />
+        <select id="select-category" required>
+          <option value="">-- SELECT CATEGORY</option>
+        </select>
+        <button 
+          class="add-item-button" 
+          type="submit"
+        >
+          ADD ITEM
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+<script>
+  const getShoppingList = async () => {
+    let items;
+    const listEl = document.getElementById('list');
+
+    await fetch('/v1/item')
+      .then(res => res.json())
+      .then(data => items = data)
+      .catch(console.err);
+
+    items.forEach(item => {
+      const { id, name, status, amount, categories} = item;
+      const elementId = `item-${id}`;
+      const newStatus = status > 0 ? 0 : 1;
+      const listItem = document.createElement('li');
+      const itemText = document.createElement('p');
+      const categoryText = document.createElement('small');
+      const deleteButton = document.createElement('button');
+
+      categoryText.textContent = 'in ';
+
+      categories.forEach(category => {
+        categoryText.textContent += category.name + ', '
+      });
+
+      itemText.setAttribute('onclick', `onClickItem('${id}', '${newStatus}')`);
+      itemText.textContent = `${amount} - ${name} \u00A0\u00A0`;
+
+      if (status > 0) {
+        itemText.className += 'done'; 
+      }
+
+      listItem.setAttribute('id', elementId);
+
+      deleteButton.setAttribute('class', 'delete-button');
+      deleteButton.setAttribute('title', 'Remove Item');
+      deleteButton.setAttribute('onclick', `removeItem('${id}')`);
+      deleteButton.textContent = '⌫';
+
+      itemText.appendChild(categoryText);
+      listItem.appendChild(itemText);
+      listItem.appendChild(deleteButton);
+      listEl.appendChild(listItem);
+    });
+  }
+
+  const getCategories = async () => {
+    let categories;
+    const selectCategoryEl = document.getElementById('select-category');
+
+    await fetch('/v1/category')
+      .then(res => res.json())
+      .then(data => categories = data)
+      .catch(console.err);
+
+    categories.forEach(category => {
+      const optionItem = document.createElement('option');
+      optionItem.textContent = category.name;
+      optionItem.value = category.id;
+
+      selectCategoryEl.appendChild(optionItem);
+    });
+  }
+
+  getShoppingList();
+  getCategories();
+
+
+  /** Helpers **/
+  const SHOPPING_LIST_EL = document.getElementById('list');
+  const ADD_ITEM_FORM = document.querySelector('form.add-item-form');
+
+  const clearList = () => {
+    SHOPPING_LIST_EL.replaceChildren();
+  }
+
+  const resetForm = () => {
+    ADD_ITEM_FORM.reset();
+  }
+
+  const onClickItem = async (id, newStatus) => {
+
+    await fetch(`/v1/item/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        status: newStatus
+      }),
+      headers: {
+        'Accept': '*/*',
+        'Content-Type': 'application/json'
+      },
+    }).catch(console.err);
+
+    clearList();
+    getShoppingList();
+  }
+
+  const removeItem = async (id) => {
+    if (!confirm('Do you really want to delete this item?')) {
+      return;
+    }
+
+    await fetch(`/v1/item/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Accept': '*/*',
+        'Content-Type': 'application/json'
+      },
+    }).catch(console.err);
+
+    clearList();
+    resetForm();
+    getShoppingList();
+  }
+
+  const addItem = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const newItemName = document.getElementById('new-item-input').value;
+    const newItemAmount = document.getElementById('amount-input').value;
+    const newItemCategory = document.getElementById('select-category').value;
+    let newItemId;
+
+    await fetch('/v1/item/', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: newItemName,
+        status: 0,
+        amount: parseInt(newItemAmount)
+      }),
+      headers: {
+        'Accept': '*/*',
+        'Content-Type': 'application/json'
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        newItemId = data.id
+      })
+      .catch(console.err);
+
+    await fetch('/v1/itemcategory', {
+      method: 'POST',
+      body: JSON.stringify({
+        itemId: newItemId,
+        categoryId: newItemCategory
+      }),
+      headers: {
+        'Accept': '*/*',
+        'Content-Type': 'application/json'
+      },
+    })
+      .then(res => res.json())
+      .then(data => console.log(data))
+      .catch(console.err);
+
+    clearList();
+    resetForm();
+    getShoppingList();
+  }
+</script>
+
+</html>

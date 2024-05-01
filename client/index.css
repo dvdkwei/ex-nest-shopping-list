@@ -1,0 +1,130 @@
+body {
+  margin: 0;
+  font-family: "Gill Sans", sans-serif;
+  background-color: #63deff;
+}
+
+h1 {
+  color: white;
+  text-shadow: 4px 4px black;
+  -webkit-text-stroke: 2px black;
+  font-size: 36px;
+}
+
+.container {
+  max-width: 100vw;
+  max-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.divider {
+  padding: .75rem;
+  max-width: 800px;
+  min-height: 200px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  /* border: 2px solid black; */
+  border-radius: 1rem;
+}
+
+.divider-line {
+  height: 100%;
+  border: 1px rgb(70, 70, 70) solid;
+}
+
+.items {
+  display: flex;
+  width: 100%;
+}
+
+ul#list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  list-style-type: none;
+}
+
+ul#list li {
+  padding: .25rem;
+  border-bottom: 1px black dotted;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+ul#list li p:hover {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+  width: 100%;
+}
+
+small {
+  color: grey;
+  font-size: 12px;
+}
+
+.delete-button {
+  height: fit-content;
+  cursor: pointer;
+  background: rgb(251, 230, 237);
+  font-size: large;
+  color: rgb(189, 0, 0);
+  box-shadow: 3px 3px black;
+}
+
+.delete-button:hover {
+  font-weight: bold;
+}
+
+.done {
+  text-decoration: line-through red wavy;
+}
+
+p.done small {
+  text-decoration: none;
+}
+
+.add-item-form {
+  margin: 0 .5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: .25rem;
+}
+
+.add-item-button {
+  margin-top: 1rem;
+  cursor: pointer;
+  background-color: pink;
+  border: 3px solid pink;
+  width: 100%;
+  padding: .25rem;
+  font-weight: 700;
+  box-shadow: 5px 5px;
+}
+
+.add-item-button:hover {
+  filter: brightness(1.05);
+}
+
+#new-item-input, 
+#select-category,
+#amount-input {
+  width: 225px;
+  height: 25px;
+  padding: 2px;
+  box-sizing: content-box;
+  border: black 3px solid;
+}
